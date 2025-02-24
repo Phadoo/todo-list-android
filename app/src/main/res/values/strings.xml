@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">To-Do List</string>
+    <string name="EditText_AddNewTask">New task</string>
+    <string name="SaveButton_AddNewTask">Save</string>
+    <string name="CancelButton_AddNewTask">Cancel</string>
+    <string name="Title_DeleteDialog">Delete Task</string>
+    <string name="Yes_DeleteDialog">Yes</string>
+    <string name="No_DeleteDialog">No</string>
+</resources>
