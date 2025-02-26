@@ -64,10 +64,8 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.SimpleCallback {
         if (position == RecyclerView.NO_POSITION) return;
 
         // Handle swipe left (edit) and swipe right (delete)
-        if (direction == ItemTouchHelper.RIGHT) {
-            showDeleteConfirmationDialog(position);
-        } else {
-            adapter.editTask(position);
+        if (direction == ItemTouchHelper.RIGHT || direction == ItemTouchHelper.LEFT) {
+            adapter.toggleTaskStatus(position);
         }
     }
 
@@ -76,10 +74,7 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.SimpleCallback {
 
         // Customize the swipe background and icon colors
         new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                .addSwipeLeftBackgroundColor(ContextCompat.getColor(context, R.color.green))
-                .addSwipeLeftActionIcon(R.drawable.edit)
-                .addSwipeRightBackgroundColor(ContextCompat.getColor(context, R.color.red))
-                .addSwipeRightActionIcon(R.drawable.delete)
+                .addBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
                 .create()
                 .decorate();
 

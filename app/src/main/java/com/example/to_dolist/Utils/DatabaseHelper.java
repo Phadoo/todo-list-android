@@ -95,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null, // Selection args
                 null, // Group by
                 null, // Having
-                COLUMN_ID + " DESC" // Order by ID descending (newest first)
+                COLUMN_STATUS + " ASC, " + COLUMN_ID + " DESC" // Order by status ascending (incomplete first), then ID descending
         )) {
             // Columns (null means all columns)
             // Selection (null means all rows)

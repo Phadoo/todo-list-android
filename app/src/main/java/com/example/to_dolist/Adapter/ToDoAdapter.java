@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.to_dolist.Model.ToDoModel;
@@ -48,21 +50,59 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) { // Bind data to the views in each item
         ToDoModel item = mList.get(position);
-        holder.textView.setText(item.getTask());
+        holder.textView.setText(item.getTask()); // Set the task text
         holder.imageButton.setSelected(toBoolean(item.getStatus()));
 
-        holder.imageButton.setOnClickListener(v -> {
-            boolean isChecked = !v.isSelected();
-            v.setSelected(isChecked);
-            myDB.updateStatus(item.getId(), isChecked ? 1 : 0);
-            item.setStatus(isChecked ? 1 : 0);
-        });
-
-        holder.textView.setOnClickListener(v -> {
+        holder.cardView.setOnClickListener(v -> { // Click listener for the cardView
             if (taskClickListener != null) {
                 taskClickListener.onTaskClicked(position, item);
             }
         });
+
+        holder.cardView.setOnLongClickListener(v -> { // Long click listener for the cardView
+            if (taskClickListener != null) { // If a listener is set
+                Toast.makeText(context, "Long Click detected", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public void toggleTaskStatus(int position) { // Toggle the status of a task
+        if (position >= 0 && position < mList.size()) { // Check if the position is valid
+            // Get the task at the given position
+            ToDoModel task = mList.get(position);
+            // Calculate the new status (toggle between 0 and 1)
+            int newStatus = task.getStatus() == 0 ? 1 : 0;
+
+            updateTaskStatus(task.getId(), newStatus, position); // Call updateTaskStatus with the new status
+
+            task.setStatus(newStatus); // Update the task's status in the database
+
+            if (newStatus == 1) {
+                // Remove from current position
+                mList.remove(position);
+                // Add to end of list
+                mList.add(task);
+                // Notify adapter of the move
+                notifyItemRemoved(position);
+                notifyItemInserted(mList.size() - 1);
+            } else {
+                // Remove from current position
+                mList.remove(position);
+                // Add to end of list
+                mList.add(0, task);
+                // Notify adapter of the move
+                notifyItemRemoved(position);
+                notifyItemInserted(0);
+            }
+        }
+    }
+
+    private void updateTaskStatus(int id, int status, int position) { // Update the status of a task in the database and in the mList
+        myDB.updateStatus(id, status); // ID
+        mList.get(position).setStatus(status); // Status
+        notifyItemChanged(position);
     }
 
     public void editTask(int position) { // Handle edit task click
@@ -72,7 +112,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         }
     }
 
-    public boolean toBoolean(int num) {
+    public boolean toBoolean(int num) { // Convert an integer to a boolean
         return num != 0;
     }
 
@@ -98,11 +138,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
 
         ImageButton imageButton;
         TextView textView;
+        CardView cardView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imageButton = itemView.findViewById(R.id.imageButton);
             textView = itemView.findViewById(R.id.imageButton_text);
+            cardView = itemView.findViewById(R.id.cardView);
         }
     }
 }
