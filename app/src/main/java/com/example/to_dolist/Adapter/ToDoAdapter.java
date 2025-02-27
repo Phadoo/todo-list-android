@@ -17,6 +17,7 @@ import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.R;
 import com.example.to_dolist.Utils.DatabaseHelper;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> {
@@ -68,6 +69,20 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
         });
     }
 
+    public void onItemMove(int fromPosition, int toPosition) { // Handle item move
+        if (fromPosition < toPosition) { // If fromPosition is less than toPosition
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(mList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(mList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        myDB.updateIndices(mList); // Update the indices in the database
+    }
+
     public void toggleTaskStatus(int position) { // Toggle the status of a task
         if (position >= 0 && position < mList.size()) { // Check if the position is valid
             // Get the task at the given position
@@ -96,6 +111,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
                 notifyItemRemoved(position);
                 notifyItemInserted(0);
             }
+            myDB.updateIndices(mList);
         }
     }
 

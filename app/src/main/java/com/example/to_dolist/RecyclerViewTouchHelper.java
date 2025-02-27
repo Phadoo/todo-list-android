@@ -20,9 +20,48 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.SimpleCallback {
     private final Context context;
 
     public RecyclerViewTouchHelper(ToDoAdapter adapter, Context context) { // Constructor
-        super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT); // Set the drag and swipe directions
         this.adapter = adapter;
         this.context = context;
+    }
+
+    @Override // Handle long press events
+    public boolean isLongPressDragEnabled() { return true; }
+
+    @Override
+    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+        int fromPosition = viewHolder.getAdapterPosition();
+        int toPosition = target.getAdapterPosition();
+
+        if (fromPosition == RecyclerView.NO_POSITION || toPosition == RecyclerView.NO_POSITION) return false;
+
+        adapter.onItemMove(fromPosition, toPosition); // Update data in adapter
+
+        return true;
+    }
+
+    @Override
+    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) { // Handle swipe events
+        // Get the position of the swiped item
+        final int position = viewHolder.getAdapterPosition();
+        if (position == RecyclerView.NO_POSITION) return;
+
+        // Handle swipe left (edit) and swipe right (delete)
+        if (direction == ItemTouchHelper.RIGHT || direction == ItemTouchHelper.LEFT) {
+            adapter.toggleTaskStatus(position);
+        }
+    }
+
+    @Override
+    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+        // Customize the swipe background and icon colors
+        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                .addBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
+                .create()
+                .decorate();
+
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
 
     private void showDeleteConfirmationDialog(final int position) { // Show a confirmation dialog before deleting an item
@@ -50,34 +89,5 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.SimpleCallback {
                     dialog.dismiss();
                 })
                 .create();
-    }
-
-    @Override
-    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        return false; // Not implemented
-    }
-
-    @Override
-    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) { // Handle swipe events
-        // Get the position of the swiped item
-        final int position = viewHolder.getAdapterPosition();
-        if (position == RecyclerView.NO_POSITION) return;
-
-        // Handle swipe left (edit) and swipe right (delete)
-        if (direction == ItemTouchHelper.RIGHT || direction == ItemTouchHelper.LEFT) {
-            adapter.toggleTaskStatus(position);
-        }
-    }
-
-    @Override
-    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
-        // Customize the swipe background and icon colors
-        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                .addBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
-                .create()
-                .decorate();
-
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
 }

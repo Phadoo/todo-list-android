@@ -24,12 +24,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "ID";
     public static final String COLUMN_TASK = "TASK";
     public static final String COLUMN_STATUS = "STATUS";
+    public static final String COLUMN_POSITION = "POSITION";
 
     // Create table query
     private static final String CREATE_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_TASK + " TEXT, "
-            + COLUMN_STATUS + " INTEGER)";
+            + COLUMN_STATUS + " INTEGER, "
+            + COLUMN_POSITION + " INTEGER)";
 
     // Index for status column
     private static final String CREATE_STATUS_INDEX = "CREATE INDEX IF NOT EXISTS idx_status ON "
@@ -57,6 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_TASK, model.getTask());
         contentValues.put(COLUMN_STATUS, 0); // Default status is 0 (incomplete)
+        contentValues.put(COLUMN_POSITION, 0);
         db.insert(TABLE_NAME, null, contentValues);
     }
 
@@ -74,6 +77,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_STATUS, status);
         db.update(TABLE_NAME, contentValues, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    public void updateIndices(List<ToDoModel> mList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (int i = 0; i < mList.size(); i++) {
+                ToDoModel task = mList.get(i);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(COLUMN_POSITION, i);
+                db.update(TABLE_NAME, contentValues, COLUMN_ID + " = ?", new String[]{String.valueOf(task.getId())});
+            }
+            db.setTransactionSuccessful();
+        } finally { db.endTransaction(); }
     }
 
     // Delete a task
@@ -95,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null, // Selection args
                 null, // Group by
                 null, // Having
-                COLUMN_STATUS + " ASC, " + COLUMN_ID + " DESC" // Order by status ascending (incomplete first), then ID descending
+                COLUMN_STATUS + " ASC, " + COLUMN_POSITION + " ASC" // Order by status ascending (incomplete first), then ID descending
         )) {
             // Columns (null means all columns)
             // Selection (null means all rows)
@@ -110,6 +127,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     task.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
                     task.setTask(cursor.getString(cursor.getColumnIndex(COLUMN_TASK)));
                     task.setStatus(cursor.getInt(cursor.getColumnIndex(COLUMN_STATUS)));
+
+                    // Read the position value
+                    if (cursor.getColumnIndex(COLUMN_POSITION) != -1) {
+                        task.setPosition(cursor.getInt(cursor.getColumnIndex(COLUMN_POSITION)));
+                    }
+
                     taskList.add(task);
                 } while (cursor.moveToNext());
             }
