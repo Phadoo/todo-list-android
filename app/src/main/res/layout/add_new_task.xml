@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -34,5 +35,23 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
         style="@style/ButtonStyle"/>
+
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/delete"
+        android:layout_below="@+id/edit_text"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="27dp"
+        android:layout_marginBottom="20dp"/>
+
+<!--    <Spinner-->
+<!--        android:id="@+id/prioritySpinner"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/edit_text"-->
+<!--        android:layout_marginTop="5dp"/>-->
 
 </RelativeLayout>

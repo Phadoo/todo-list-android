@@ -2,6 +2,9 @@ package com.example.to_dolist;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.to_dolist.Adapter.ToDoAdapter;
 import com.example.to_dolist.Model.ToDoModel;
@@ -22,11 +26,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnDialogCloseListener, ToDoAdapter.TaskClickListener {
 
+    // Initialize components
     RecyclerView recyclerView; // RecyclerView to display tasks
     FloatingActionButton addButton; // FloatingActionButton to add new tasks
     DatabaseHelper myDB; // DatabaseHelper to interact with the database
     private List<ToDoModel> mList; // List to store tasks
     private ToDoAdapter adapter; // Bridge between data (mList) and the UI (recyclerView)
+    private TextView emptyTextView; // TextView to display a message when the list is empty
+    private SwipeRefreshLayout swipeRefreshLayout; // SwipeRefreshLayout for refreshing the list
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +46,13 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
             return insets;
         });
 
-        // Initialize components
+        emptyTextView = findViewById(R.id.emptyTextView);
         recyclerView = findViewById(R.id.recyclerView);
         addButton = findViewById(R.id.addButton);
         myDB = new DatabaseHelper(MainActivity.this);
         mList = new ArrayList<>();
         adapter = new ToDoAdapter(myDB, this ,this);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         // Set up RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -53,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
 
         // Fetch tasks from the database and update the adapter
         mList = myDB.getAllTasks();
+        updateUI();
         adapter.setTasks(mList);
 
         // Set up the FloatingActionButton to open the AddNewTask dialog
@@ -61,6 +70,29 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         // Set up swipe-to-delete functionality
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new RecyclerViewTouchHelper(adapter, this));
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        // Set up swipe-to-refresh functionality and color scheme
+        swipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+        swipeRefreshLayout.setOnRefreshListener(this::refreshTasks);
+    }
+
+    private void updateUI() { // Update the UI based on the list of tasks
+        if (mList.isEmpty()) {
+            emptyTextView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyTextView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshTasks() {
+        new Handler().postDelayed(() -> { // Simulate a delay for refreshing
+            mList = myDB.getAllTasks();
+            adapter.setTasks(mList);
+            updateUI();
+            swipeRefreshLayout.setRefreshing(false); // Stop refreshing
+        }, 2000); // Delay in milliseconds
     }
 
     @Override
@@ -80,5 +112,6 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
     public void onDialogClose(DialogInterface dialogInterface) { // Callback method from AddNewTask when the dialog is closed
         mList = myDB.getAllTasks();
         adapter.setTasks(mList);
+        updateUI();
     }
 }

@@ -1,9 +1,11 @@
 package com.example.to_dolist;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,11 +15,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.example.to_dolist.Adapter.ToDoAdapter;
 import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.Utils.DatabaseHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -31,6 +35,8 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
     // Member variables
     private DatabaseHelper myDB;
+
+    // UI components
     private EditText mEditText;
 
     public static AddNewTask newInstance(int taskId, String task) { // Factory method to create a new instance of the fragment
@@ -60,6 +66,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
         mEditText = view.findViewById(R.id.edit_text);
         Button mSaveButton = view.findViewById(R.id.addButton);
         Button mCancelButton = view.findViewById(R.id.cancelButton);
+        ImageButton mDeleteButton = view.findViewById(R.id.deleteButton);
 
         // Use MainActivity's DatabaseHelper instance (passed via constructor/setter if needed)
         myDB = new DatabaseHelper(requireActivity());
@@ -75,6 +82,13 @@ public class AddNewTask extends BottomSheetDialogFragment {
             taskId = bundle.getInt(ID_KEY);
             String task = bundle.getString(TASK_KEY, "");
             mEditText.setText(task);
+        }
+
+        // Initialize Delete Button State
+        if (isUpdate) {
+            mDeleteButton.setVisibility(View.VISIBLE);
+        } else {
+            mDeleteButton.setVisibility(View.GONE);
         }
 
         // Initialize Save Button State
@@ -104,6 +118,12 @@ public class AddNewTask extends BottomSheetDialogFragment {
         // Set up click listeners
         mSaveButton.setOnClickListener(v -> handleSave(finalTaskId, finalIsUpdate));
         mCancelButton.setOnClickListener(v -> dismiss());
+        mDeleteButton.setOnClickListener(v -> deleteTask(finalTaskId));
+    }
+
+    private void deleteTask(final int position) {
+        myDB.deleteTask(position);
+        dismiss();
     }
 
     private void updateSaveButtonState(boolean isEmpty) { // Update Save Button State
