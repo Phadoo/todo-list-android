@@ -19,14 +19,13 @@
             android:layout_height="50dp"
             android:text="To-Do List"
             android:layout_centerHorizontal="true"
-            android:textSize="25sp"
-            android:textStyle="bold"
             android:gravity="center"
             android:layout_marginTop="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/TitleStyle" />
 
         <TextView
             android:id="@+id/emptyTextView"

@@ -67,6 +67,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
         Button mSaveButton = view.findViewById(R.id.addButton);
         Button mCancelButton = view.findViewById(R.id.cancelButton);
         ImageButton mDeleteButton = view.findViewById(R.id.deleteButton);
+        ImageButton mTimeButton = view.findViewById(R.id.timeButton);
 
         // Use MainActivity's DatabaseHelper instance (passed via constructor/setter if needed)
         myDB = new DatabaseHelper(requireActivity());
@@ -119,9 +120,12 @@ public class AddNewTask extends BottomSheetDialogFragment {
         mSaveButton.setOnClickListener(v -> handleSave(finalTaskId, finalIsUpdate));
         mCancelButton.setOnClickListener(v -> dismiss());
         mDeleteButton.setOnClickListener(v -> deleteTask(finalTaskId));
+
+        // TODO: Add Time Button
+//        mTimeButton.setOnClickListener(v -> AddTime.newInstance().show(requireActivity().getSupportFragmentManager(), AddTime.TAG));
     }
 
-    private void deleteTask(final int position) {
+    private void deleteTask(final int position) { // Delete Task
         myDB.deleteTask(position);
         dismiss();
     }
