@@ -122,7 +122,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
         mDeleteButton.setOnClickListener(v -> deleteTask(finalTaskId));
 
         // TODO: Add Time Button
-//        mTimeButton.setOnClickListener(v -> AddTime.newInstance().show(requireActivity().getSupportFragmentManager(), AddTime.TAG));
+        mTimeButton.setOnClickListener(v -> AddTime.newInstance().show(requireActivity().getSupportFragmentManager(), AddTime.TAG));
     }
 
     private void deleteTask(final int position) { // Delete Task
