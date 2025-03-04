@@ -75,31 +75,27 @@
                     android:layout_marginStart="20dp"
                     style="@style/PromptStyle"/>
 
-                <Button
-                    android:id="@+id/timeTabButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:text="15:15"
-                    android:padding="7dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginEnd="20dp"/>
-
-                <Button
+                <android.widget.Button
                     android:id="@+id/dateTabButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:text="3 March 2025"
-                    android:padding="7dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginEnd="80dp"/>
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="80dp"
+                    style="@style/ReminderButton"/>
+
+                <android.widget.Button
+                    android:id="@+id/timeTabButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="15:15"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="20dp"
+                    style="@style/ReminderButton"/>
                 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -114,6 +110,7 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TimePicker
+                android:id="@+id/timePicker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:timePickerMode="spinner"

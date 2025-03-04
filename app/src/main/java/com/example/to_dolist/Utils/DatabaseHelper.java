@@ -60,10 +60,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_TASK, model.getTask());
         contentValues.put(COLUMN_STATUS, 0); // Default status is 0 (incomplete)
         contentValues.put(COLUMN_POSITION, 0);
-        if (model.getDate() == 0) { // Date can be null
+        if (model.getDateTime() == 0) { // Date can be null
             contentValues.putNull(COLUMN_DATE);
         } else {
-            contentValues.put(COLUMN_DATE, model.getDate());
+            contentValues.put(COLUMN_DATE, model.getDateTime());
         }
         db.insert(TABLE_NAME, null, contentValues);
     }
@@ -131,7 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         task.setPosition(cursor.getInt(cursor.getColumnIndex(COLUMN_POSITION)));
                     }
 
-                    task.setDate(cursor.getLong(cursor.getColumnIndex(COLUMN_DATE)));
+                    task.setDateTime(cursor.getLong(cursor.getColumnIndex(COLUMN_DATE)));
 
                     taskList.add(task);
                 } while (cursor.moveToNext());

@@ -57,6 +57,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!--Planning on removing this later-->
     <ImageButton
         android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
@@ -67,14 +68,17 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="27dp"/>
 
-    <ImageButton
+    <!--Change to Button later-->
+    <android.widget.Button
         android:id="@+id/timeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableStart="@drawable/datetime"
+        android:paddingLeft="5dp"
+        android:minHeight="0dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/datetime"
         android:layout_below="@+id/edit_text"
-        android:layout_marginStart="27dp"
+        android:layout_marginStart="18dp"
         android:layout_marginBottom="20dp"/>
 
 </RelativeLayout>

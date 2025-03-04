@@ -4,7 +4,7 @@ public class ToDoModel {
 
     private String task;
     private int id, status, position;
-    private long date;
+    private long dateTime;
 
     public String getTask() { return task; }
 
@@ -22,7 +22,7 @@ public class ToDoModel {
 
     public void setPosition(int position) { this.position = position; }
 
-    public long getDate() { return date; }
+    public long getDateTime() { return dateTime; }
 
-    public void setDate(long date) { this.date = date; }
+    public void setDateTime(long dateTime) { this.dateTime = dateTime; }
 }

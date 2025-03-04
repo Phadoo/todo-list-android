@@ -26,18 +26,25 @@ import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.Utils.DatabaseHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-public class AddNewTask extends BottomSheetDialogFragment {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnDateTimeSetListener {
 
     // Constants for passing data between fragments
     public static final String TAG = "AddNewTask";
     public static final String TASK_KEY = "task";
     public static final String ID_KEY = "Id";
+    private long selectedDateTime = -1;
 
     // Member variables
     private DatabaseHelper myDB;
 
     // UI components
     private EditText mEditText;
+    private Button mTimeButton; // Changed from ImageButton to Button
 
     public static AddNewTask newInstance(int taskId, String task) { // Factory method to create a new instance of the fragment
         Bundle args = new Bundle();
@@ -67,7 +74,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
         Button mSaveButton = view.findViewById(R.id.addButton);
         Button mCancelButton = view.findViewById(R.id.cancelButton);
         ImageButton mDeleteButton = view.findViewById(R.id.deleteButton);
-        ImageButton mTimeButton = view.findViewById(R.id.timeButton);
+        mTimeButton = view.findViewById(R.id.timeButton);
 
         // Use MainActivity's DatabaseHelper instance (passed via constructor/setter if needed)
         myDB = new DatabaseHelper(requireActivity());
@@ -75,6 +82,12 @@ public class AddNewTask extends BottomSheetDialogFragment {
         // Check if this is an update or a new task
         boolean isUpdate = false;
         int taskId = -1;
+
+        // Initialize with current time
+        if (selectedDateTime == -1) {
+            selectedDateTime = System.currentTimeMillis();
+        }
+//        updateTimeButtonText();
 
         // If arguments are passed, this is an update - otherwise, it's a new task; Bundles are used to pass data between fragments
         Bundle bundle = getArguments();
@@ -156,6 +169,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
             item.setTask(text);
             item.setStatus(0);
             myDB.insertTask(item);
+            item.setDateTime(selectedDateTime); // Set the selected date and time
         }
         dismiss();
     }
@@ -168,5 +182,20 @@ public class AddNewTask extends BottomSheetDialogFragment {
         if (activity instanceof OnDialogCloseListener) {
             ((OnDialogCloseListener) activity).onDialogClose(dialog);
         }
+    }
+
+    @Override
+    public void onDateTimeSet(int year, int month, int day, int hour, int minute) { // Handle date and time selection
+        // Convert to Calendar
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, minute);
+        selectedDateTime = calendar.getTimeInMillis();
+
+        updateTimeButtonText();
+    }
+
+    private void updateTimeButtonText() {
+        SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()); // Format the date and time
+        mTimeButton.setText(sdf.format(new Date(selectedDateTime))); // Set the formatted date and time text
     }
 }
