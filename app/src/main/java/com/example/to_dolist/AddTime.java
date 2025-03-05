@@ -136,15 +136,9 @@ public class AddTime extends BottomSheetDialogFragment {
         timeTabButton.setText(time);
     }
 
-//    @Override
-//    public void onAttach(@NonNull Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnDateTimeSetListener) {
-//            listener = (OnDateTimeSetListener) context;
-//        } else {
-//            throw new RuntimeException(context + " must implement OnDateTimeSetListener");
-//        }
-//    }
+    public void setListener(OnDateTimeSetListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {

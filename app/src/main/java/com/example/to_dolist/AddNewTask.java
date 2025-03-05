@@ -135,7 +135,11 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
         mDeleteButton.setOnClickListener(v -> deleteTask(finalTaskId));
 
         // TODO: Add Time Button
-        mTimeButton.setOnClickListener(v -> AddTime.newInstance().show(requireActivity().getSupportFragmentManager(), AddTime.TAG));
+        mTimeButton.setOnClickListener(v -> {
+            AddTime addTime = AddTime.newInstance();
+            addTime.setListener(this);
+            addTime.show(requireActivity().getSupportFragmentManager(), AddTime.TAG);
+        });
     }
 
     private void deleteTask(final int position) { // Delete Task
@@ -190,7 +194,6 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day, hour, minute);
         selectedDateTime = calendar.getTimeInMillis();
-
         updateTimeButtonText();
     }
 
