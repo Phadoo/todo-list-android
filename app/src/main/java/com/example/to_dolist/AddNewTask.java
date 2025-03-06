@@ -9,6 +9,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +38,9 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
     public static final String TAG = "AddNewTask";
     public static final String TASK_KEY = "task";
     public static final String ID_KEY = "Id";
-    private long selectedDateTime = -1;
+    public static final String DATE_TIME_KEY = "Datetime";
+
+    private long selectedDateTime = 0;
 
     // Member variables
     private DatabaseHelper myDB;
@@ -46,10 +49,17 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
     private EditText mEditText;
     private Button mTimeButton; // Changed from ImageButton to Button
 
-    public static AddNewTask newInstance(int taskId, String task) { // Factory method to create a new instance of the fragment
+    private OnTaskAddedListener listener; // Listener for task added events
+
+    public interface OnTaskAddedListener { // This is an interface that the activity that hosts this fragment must implement, this listens for task added events
+        void onTaskAdded();
+    }
+
+    public static AddNewTask newInstance(int taskId, String task, long dateTime) { // Factory method to create a new instance of the fragment
         Bundle args = new Bundle();
         args.putInt(ID_KEY, taskId);
         args.putString(TASK_KEY, task);
+        args.putLong(DATE_TIME_KEY, dateTime);
         AddNewTask fragment = new AddNewTask();
         fragment.setArguments(args);
         return fragment;
@@ -83,18 +93,16 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
         boolean isUpdate = false;
         int taskId = -1;
 
-        // Initialize with current time
-        if (selectedDateTime == -1) {
-            selectedDateTime = System.currentTimeMillis();
-        }
-//        updateTimeButtonText();
-
         // If arguments are passed, this is an update - otherwise, it's a new task; Bundles are used to pass data between fragments
         Bundle bundle = getArguments();
         if (bundle != null && bundle.containsKey(ID_KEY)) {
             isUpdate = true;
             taskId = bundle.getInt(ID_KEY);
             String task = bundle.getString(TASK_KEY, "");
+            selectedDateTime = bundle.getLong(DATE_TIME_KEY);
+
+            // Set retrieved values to UI components
+            updateTimeButtonText();
             mEditText.setText(task);
         }
 
@@ -133,13 +141,21 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
         mSaveButton.setOnClickListener(v -> handleSave(finalTaskId, finalIsUpdate));
         mCancelButton.setOnClickListener(v -> dismiss());
         mDeleteButton.setOnClickListener(v -> deleteTask(finalTaskId));
-
-        // TODO: Add Time Button
         mTimeButton.setOnClickListener(v -> {
             AddTime addTime = AddTime.newInstance();
             addTime.setListener(this);
             addTime.show(requireActivity().getSupportFragmentManager(), AddTime.TAG);
         });
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnTaskAddedListener) {
+            listener = (OnTaskAddedListener) context;
+        } else {
+            throw new RuntimeException(context + " must implement OnTaskAddedListener");
+        }
     }
 
     private void deleteTask(final int position) { // Delete Task
@@ -167,14 +183,20 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
     private void handleSave(int taskId, boolean isUpdate) { // Handle Save Button Click
         String text = mEditText.getText().toString();
         if (isUpdate) {
-            myDB.updateTask(taskId, text);
+            myDB.updateTaskDetails(taskId, text, selectedDateTime);
         } else {
             ToDoModel item = new ToDoModel();
             item.setTask(text);
             item.setStatus(0);
-            myDB.insertTask(item);
             item.setDateTime(selectedDateTime); // Set the selected date and time
+            myDB.insertTask(item);
+
+            // Notify the listener that a new task was added
+            if (listener != null) {
+                listener.onTaskAdded();
+            }
         }
+
         dismiss();
     }
 
@@ -189,16 +211,15 @@ public class AddNewTask extends BottomSheetDialogFragment implements AddTime.OnD
     }
 
     @Override
-    public void onDateTimeSet(int year, int month, int day, int hour, int minute) { // Handle date and time selection
-        // Convert to Calendar
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, hour, minute);
-        selectedDateTime = calendar.getTimeInMillis();
+    public void onDateTimeSet(long dateTime) { // Handle date and time selection
+        selectedDateTime = dateTime; // Retrieve dateTime from AddTime fragment
         updateTimeButtonText();
     }
 
     private void updateTimeButtonText() {
         SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()); // Format the date and time
-        mTimeButton.setText(sdf.format(new Date(selectedDateTime))); // Set the formatted date and time text
+        if (selectedDateTime > 0) {
+            mTimeButton.setText(sdf.format(new Date(selectedDateTime))); // Set the formatted date and time text
+        } else mTimeButton.setText("");
     }
 }

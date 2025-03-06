@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.to_dolist.Model.ToDoModel;
 
@@ -59,8 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_TASK, model.getTask());
         contentValues.put(COLUMN_STATUS, 0); // Default status is 0 (incomplete)
-        contentValues.put(COLUMN_POSITION, 0);
-        if (model.getDateTime() == 0) { // Date can be null
+        if (model.getDateTime() == 0) { // Date can be null, and will equate to zero
             contentValues.putNull(COLUMN_DATE);
         } else {
             contentValues.put(COLUMN_DATE, model.getDateTime());
@@ -69,10 +69,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Update a task
-    public void updateTask(int id, String task) {
+    public void updateTaskDetails(int id, String task, long dateTime) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_TASK, task);
+        contentValues.put(COLUMN_DATE, dateTime);
         db.update(TABLE_NAME, contentValues, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
@@ -102,6 +103,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteTask(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    public void updateDate(int id, long dateTime) {
+        SQLiteDatabase db = this. getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DATE, dateTime);
+        db.update(TABLE_NAME, contentValues, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     // Fetch all tasks

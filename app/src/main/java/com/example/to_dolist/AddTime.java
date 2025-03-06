@@ -18,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class AddTime extends BottomSheetDialogFragment {
@@ -29,7 +30,7 @@ public class AddTime extends BottomSheetDialogFragment {
 
     // For Data Callback (Interface)
     public interface OnDateTimeSetListener {
-        void onDateTimeSet(int year, int month, int day, int hour, int minute);
+        void onDateTimeSet(long dateTime);
     }
 
     private OnDateTimeSetListener listener;
@@ -113,9 +114,15 @@ public class AddTime extends BottomSheetDialogFragment {
             int hour = timePicker.getHour();
             int minute = timePicker.getMinute();
 
+            // Use Calendar to create a timestamp
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(year, month, day, hour, minute);
+            long dateTime = calendar.getTimeInMillis();
+
             if (listener != null) {
-                listener.onDateTimeSet(year, month, day, hour, minute);
+                listener.onDateTimeSet(dateTime);
             }
+
             dismiss();
         });
 

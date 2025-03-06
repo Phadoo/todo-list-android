@@ -141,6 +141,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
     public void setTasks(List<ToDoModel> mList) {
         this.mList = mList;
         notifyDataSetChanged();
+        myDB.updateIndices(mList);
     }
 
     public void deleteTask(int position) {

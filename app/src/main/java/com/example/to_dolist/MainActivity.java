@@ -3,6 +3,7 @@ package com.example.to_dolist;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,10 +22,13 @@ import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.Utils.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements OnDialogCloseListener, ToDoAdapter.TaskClickListener {
+public class MainActivity extends AppCompatActivity implements OnDialogCloseListener, ToDoAdapter.TaskClickListener, AddNewTask.OnTaskAddedListener {
 
     // Initialize components
     RecyclerView recyclerView; // RecyclerView to display tasks
@@ -76,6 +80,11 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         swipeRefreshLayout.setOnRefreshListener(this::refreshTasks);
     }
 
+    @Override
+    public void onTaskAdded() {
+        adapter.setTasks(mList); // Update the adapter with the new task addition
+    }
+
     private void updateUI() { // Update the UI based on the list of tasks
         if (mList.isEmpty()) {
             emptyTextView.setVisibility(View.VISIBLE);
@@ -89,10 +98,36 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
     private void refreshTasks() {
         new Handler().postDelayed(() -> { // Simulate a delay for refreshing
             mList = myDB.getAllTasks();
+
+            // Call database checker
+            checkDatabase(mList);
+
             adapter.setTasks(mList);
             updateUI();
             swipeRefreshLayout.setRefreshing(false); // Stop refreshing
         }, 2000); // Delay in milliseconds
+    }
+
+    public void checkDatabase(List<ToDoModel> mList) {
+        // Log all database contents
+        Log.d("DatabaseContents", "--- All Tasks in Database ---");
+        for (ToDoModel task : mList) {
+            // Convert long timestamp to readable date
+            String dateTimeStr = "N/A";
+            long dateTime = task.getDateTime();
+            if (dateTime > 0) {
+                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault());
+                Date date = new Date(dateTime);
+                dateTimeStr = sdf.format(date);
+            }
+
+            Log.d("DatabaseContents", "ID: " + task.getId() +
+                    ", Task: " + task.getTask() +
+                    ", Status: " + (task.getStatus() == 1 ? "Completed" : "Active") +
+                    ", DateTime: " + dateTimeStr +
+                    ", Position: " + task.getPosition());
+        }
+        Log.d("DatabaseContents", "--- End of Database Contents ---");
     }
 
     @Override
@@ -101,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         Bundle bundle = new Bundle();
         bundle.putInt(AddNewTask.ID_KEY, task.getId());
         bundle.putString(AddNewTask.TASK_KEY, task.getTask());
+        bundle.putLong(AddNewTask.DATE_TIME_KEY, task.getDateTime());
 
         // Create and show the AddNewTask dialog (edit task)
         AddNewTask editTaskDialog = AddNewTask.newInstance();
