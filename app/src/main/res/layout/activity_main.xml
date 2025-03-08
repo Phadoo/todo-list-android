@@ -27,6 +27,25 @@
             app:layout_constraintTop_toTopOf="parent"
             style="@style/TitleStyle" />
 
+        <!-- Spinner for filtering tasks -->
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:id="@+id/spinnerLayout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/textView"-->
+<!--            android:layout_marginStart="100dp"-->
+<!--            android:layout_marginEnd="100dp"-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">-->
+
+<!--            <AutoCompleteTextView-->
+<!--                android:id="@+id/categorySpinner"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:inputType="none"-->
+<!--                android:focusable="false"/>-->
+
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
         <TextView
             android:id="@+id/emptyTextView"
             android:layout_width="match_parent"

@@ -21,18 +21,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/selector"
             android:backgroundTint="@android:color/transparent"/>
 
-        <TextView
-            android:id="@+id/imageButton_text"
-            android:layout_toEndOf="@id/imageButton"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Task here"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="3dp"
-            android:textSize="18sp"/>
+            android:orientation="vertical"
+            android:layout_toEndOf="@+id/imageButton"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/imageButton_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Task here"
+                android:layout_centerInParent="true"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/dateTime_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date here"
+                android:textSize="12dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

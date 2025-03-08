@@ -5,9 +5,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -57,6 +65,31 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         mList = new ArrayList<>();
         adapter = new ToDoAdapter(myDB, this ,this);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        /*
+
+        TODO: Check if spinner is still needed as a feature
+        Files included:
+        - spinner_item.xml
+        - spinner_dropdown_item.xml
+        - styles.xml
+
+        AutoCompleteTextView spinnerTextView = findViewById(R.id.categorySpinner);
+        String[] items = {"All", "Due today", "A day before", "Less than a week"};
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, items) {
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                // Customize dropdown item appearance
+                //textView.setPadding(20, 16, 20, 16);
+                return view;
+            }
+        };
+        categoryAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinnerTextView.setAdapter(categoryAdapter);
+
+        */
 
         // Set up RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -108,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         }, 2000); // Delay in milliseconds
     }
 
-    public void checkDatabase(List<ToDoModel> mList) {
+    public void checkDatabase(List<ToDoModel> mList) { // For checking
         // Log all database contents
         Log.d("DatabaseContents", "--- All Tasks in Database ---");
         for (ToDoModel task : mList) {
