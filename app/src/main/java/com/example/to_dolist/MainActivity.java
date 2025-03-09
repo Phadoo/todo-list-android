@@ -1,6 +1,8 @@
 package com.example.to_dolist;
 
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.to_dolist.Adapter.ToDoAdapter;
 import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.Utils.DatabaseHelper;
+import com.example.to_dolist.Utils.NotificationHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -65,6 +69,26 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         mList = new ArrayList<>();
         adapter = new ToDoAdapter(myDB, this ,this);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        Button notifyButton = findViewById(R.id.notifyButton);
+        notifyButton.setOnClickListener(v -> {
+            // Check notification permission for Android 13+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 100);
+                    return;
+                }
+            }
+
+            // Show notification
+            NotificationHelper helper = new NotificationHelper(this);
+            helper.showNotification(
+                    "New Message",
+                    "You have received a new message!",
+                    1
+            );
+        });
 
         /*
 
@@ -146,13 +170,16 @@ public class MainActivity extends AppCompatActivity implements OnDialogCloseList
         Log.d("DatabaseContents", "--- All Tasks in Database ---");
         for (ToDoModel task : mList) {
             // Convert long timestamp to readable date
-            String dateTimeStr = "N/A";
+            //String dateTimeStr = "N/A";
             long dateTime = task.getDateTime();
-            if (dateTime > 0) {
-                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault());
-                Date date = new Date(dateTime);
-                dateTimeStr = sdf.format(date);
-            }
+            Date date = new Date(dateTime);
+            String dateTimeStr = String.valueOf(dateTime);
+//            if (dateTime > 0) {
+//                SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault());
+//                //Date date = new Date(dateTime);
+//                //dateTimeStr = sdf.format(date);
+//                dateTimeStr = String.valueOf(dateTime);
+//            }
 
             Log.d("DatabaseContents", "ID: " + task.getId() +
                     ", Task: " + task.getTask() +

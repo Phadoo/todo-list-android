@@ -17,8 +17,11 @@ import com.example.to_dolist.Model.ToDoModel;
 import com.example.to_dolist.R;
 import com.example.to_dolist.Utils.DatabaseHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> {
 
@@ -52,6 +55,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) { // Bind data to the views in each item
         ToDoModel item = mList.get(position);
         holder.textView.setText(item.getTask()); // Set the task text
+        if (item.getDateTime() > 0) {
+            holder.dateTime.setVisibility(View.VISIBLE);
+            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy, HH:mm", Locale.getDefault()); // Format the date and time
+            holder.dateTime.setText(sdf.format(new Date(item.getDateTime()))); // Set the formatted date and time text
+        } else {
+            holder.dateTime.setVisibility(View.GONE);
+        }
         holder.imageButton.setSelected(toBoolean(item.getStatus()));
 
         holder.cardView.setOnClickListener(v -> { // Click listener for the cardView
@@ -154,13 +164,14 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageButton imageButton;
-        TextView textView;
+        TextView textView, dateTime;
         CardView cardView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imageButton = itemView.findViewById(R.id.imageButton);
             textView = itemView.findViewById(R.id.imageButton_text);
+            dateTime = itemView.findViewById(R.id.dateTime_text);
             cardView = itemView.findViewById(R.id.cardView);
         }
     }
