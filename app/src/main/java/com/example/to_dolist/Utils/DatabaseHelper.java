@@ -1,13 +1,17 @@
 package com.example.to_dolist.Utils;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.to_dolist.DeadlineReceiver;
 import com.example.to_dolist.Model.ToDoModel;
 
 import java.util.ArrayList;
@@ -149,5 +153,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return taskList;
+    }
+
+    // Method to cancel an existing alarm
+    public void cancelAlarm(Context context, int taskId) {
+        // Get the AlarmManager system service
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Create an intent for the DeadlineReceiver
+        Intent intent = new Intent(context, DeadlineReceiver.class);
+
+        // Get the PendingIntent associated with the task ID
+        // FLAG_NO_CREATE: Only retrieve if the PendingIntent already exists, do not create a new one
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, taskId, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+
+        // If the PendingIntent exists, and we have a valid alarmManager, cancel it
+        if (pendingIntent != null && alarmManager != null) {
+            // Cancel the alarm using the PendingIntent
+            alarmManager.cancel(pendingIntent);
+            Log.d("DatabaseHelper", "Alarm canceled for task ID: " + taskId);
+        }
     }
 }
